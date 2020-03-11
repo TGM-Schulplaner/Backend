@@ -1,1 +1,1 @@
-# TGM-Schulplaner
+# TGM-Schulplaner Backend
