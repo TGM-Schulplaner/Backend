@@ -1,0 +1,12 @@
+active_directory:
+  root: "ou=tgm,dc=tgm,dc=ac,dc=at"
+  filter: ""
+  url: "ldap://dc-01.tgm.ac.at/"
+  domain: "tgm.ac.at"
+secure_endpoints: "/**"
+spring:
+  r2dbc:
+    url: "r2dbc:mysql://<url>:<port>"
+    name: "<database>"
+    username: "<username>"
+    password: "<password>"
