@@ -26,16 +26,11 @@ import java.util.Collections;
  */
 @Slf4j
 @Configuration
-@PropertySource("classpath:application.yml")
+@PropertySource("classpath:application_template.yml")
 @NoArgsConstructor
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-
-    private static final String ALLE = "alle";
-    private static final String EVERYONE_PASSWORD = "everyonePassword";
-    private static final String LEHRER = "lehrer";
-    private static final String SCHUELER = "schueler";
 
     @Value("${active_directory.url}")    private String adUrl;
     @Value("${active_directory.domain}") private String adDomain;
@@ -55,11 +50,11 @@ public class SecurityConfig {
     @Bean
     ReactiveAuthenticationManager authenticationManager(UserDetailsContextMapper mapper) {
 
-        ActiveDirectoryLdapAuthenticationProvider adldap = new ActiveDirectoryLdapAuthenticationProvider(adDomain, adUrl, adRoot);
+        ActiveDirectoryLdapAuthenticationProvider adap = new ActiveDirectoryLdapAuthenticationProvider(adDomain, adUrl, adRoot);
         if (!adSearchFilter.isBlank())
-            adldap.setSearchFilter(adSearchFilter);
-        adldap.setUserDetailsContextMapper(mapper);
-        /*adldap.setAuthoritiesMapper(authorities -> authorities.stream()
+            adap.setSearchFilter(adSearchFilter);
+        adap.setUserDetailsContextMapper(mapper);
+        /*adap.setAuthoritiesMapper(authorities -> authorities.stream()
                 .filter(a -> !a.getAuthority().equals(EVERYONE_PASSWORD))
                 .filter(a -> !a.getAuthority().equals(ALLE))
                 .flatMap(grantedAuthority -> {
@@ -76,7 +71,7 @@ public class SecurityConfig {
                         return Stream.of(grantedAuthority);
                 }).collect(Collectors.toSet()));*/
 
-        AuthenticationManager am = new ProviderManager(Collections.singletonList(adldap));
+        AuthenticationManager am = new ProviderManager(Collections.singletonList(adap));
 
         return new ReactiveAuthenticationManagerAdapter(am);
     }

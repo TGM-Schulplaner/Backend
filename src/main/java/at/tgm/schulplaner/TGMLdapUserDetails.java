@@ -12,9 +12,7 @@ public class TGMLdapUserDetails extends LdapUserDetailsImpl {
     private String employeeType;
     private String department;
 
-    protected TGMLdapUserDetails() {
-
-    }
+    protected TGMLdapUserDetails() {}
 
     public String getName() {
         return name;
@@ -39,6 +37,9 @@ public class TGMLdapUserDetails extends LdapUserDetailsImpl {
 
         public Essence(TGMLdapUserDetails copyMe) {
             super(copyMe);
+            setName(copyMe.name);
+            setDepartment(copyMe.department);
+            setEmployeeType(copyMe.employeeType);
         }
 
         @Override

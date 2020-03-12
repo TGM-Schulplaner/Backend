@@ -7,9 +7,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @SpringBootApplication
 @EnableWebFlux
 public class TgmSchulplanerApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(TgmSchulplanerApplication.class, args);
     }
-
 }
