@@ -22,7 +22,13 @@
     },
     {
       "name": "secure_endpoints",
-      "type": "java.lang.String",
-      "description": "The secured endpoints separated by '|'."
+      "type": "java.util.Collection<java.lang.String>",
+      "description": "The secured endpoints."
+    },
+    {
+      "name": "admin_accounts",
+      "type": "java.util.Collection<java.lang.String>",
+      "description": "The global admin accounts."
     }
-  ] }
+  ]
+}
