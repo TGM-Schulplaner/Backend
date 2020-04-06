@@ -4,24 +4,25 @@ import at.tgm.schulplaner.repository.UserRepository;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.ReactiveAuthenticationManagerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
-import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Georg Burkl
@@ -42,24 +43,27 @@ public class SecurityConfig {
     @Value("${secure_endpoints}")        private Collection<String> secureEndpoints;
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
         return http
                 .exceptionHandling()
-                .authenticationEntryPoint((swe, e) ->
+                /*.authenticationEntryPoint((swe, e) ->
                         Mono.fromRunnable(() ->
                                 swe.getResponse()
-                                        .setStatusCode(HttpStatus.UNAUTHORIZED)))
+                                        .setStatusCode(HttpStatus.UNAUTHORIZED)))*/
                 .accessDeniedHandler((swe, e) ->
                         Mono.fromRunnable(() ->
                                 swe.getResponse()
                                         .setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
-                .cors().and()
+                .cors()
+                .configurationSource(corsConfigurationSource)
+                .and()
                 .csrf().disable()
                 .formLogin().disable()
-                .httpBasic().and()
+                .httpBasic().disable()
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                .pathMatchers("/api/v1/login").permitAll()
                 .pathMatchers(secureEndpoints.toArray(String[]::new)).authenticated()
                 .anyExchange().permitAll()
                 .and()
@@ -67,17 +71,33 @@ public class SecurityConfig {
     }
 
     @Bean
-    ReactiveAuthenticationManager authenticationManager(UserDetailsContextMapper mapper) {
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Collections.singletonList("*"));
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    /*@Bean
+    ReactiveAuthenticationManager authenticationManager(ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider) {
+        return new ReactiveAuthenticationManagerAdapter(new ProviderManager(ldapAuthenticationProvider));
+    }*/
+
+    @Bean
+    ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider(UserRepository repository) {
         ActiveDirectoryLdapAuthenticationProvider adLdap = new ActiveDirectoryLdapAuthenticationProvider(adDomain, adUrl, adRoot);
         if (!adSearchFilter.isBlank())
             adLdap.setSearchFilter(adSearchFilter);
-        adLdap.setUserDetailsContextMapper(mapper);
-        return new ReactiveAuthenticationManagerAdapter(new ProviderManager(adLdap));
+        adLdap.setUserDetailsContextMapper(new CustomLdapUserDetailsMapper(repository));
+        return adLdap;
     }
 
     @Bean
-    UserDetailsContextMapper mapper(UserRepository repository) {
-        return new CustomLdapUserDetailsMapper(repository);
+    WebFluxProperties webFluxProperties() {
+        return new WebFluxProperties();
     }
 
     /**

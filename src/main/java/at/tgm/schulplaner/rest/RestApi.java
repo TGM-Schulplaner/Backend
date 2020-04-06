@@ -8,12 +8,18 @@ import at.tgm.schulplaner.repository.GroupRepository;
 import at.tgm.schulplaner.repository.MemberRepository;
 import at.tgm.schulplaner.repository.UserRepository;
 import at.tgm.schulplaner.security.JWTUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,6 +34,7 @@ import java.util.UUID;
 @SuppressWarnings("ConstantConditions")
 @Slf4j
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/v1")
 public class RestApi {
     //region repositories
@@ -35,6 +42,7 @@ public class RestApi {
     private final UserRepository userRepo;
     private final MemberRepository memberRepo;
     private final GroupRepository groupRepo;
+    private final ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider;
     private final Collection<String> globalAdmins;
     private final JWTUtil jwtUtil;
 
@@ -42,10 +50,12 @@ public class RestApi {
                    MemberRepository memberRepo,
                    GroupRepository groupRepo,
                    JWTUtil jwtUtil,
+                   ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider,
                    @Value("${admin_accounts}") Collection<String> globalAdmins) {
         this.userRepo = userRepo;
         this.memberRepo = memberRepo;
         this.groupRepo = groupRepo;
+        this.ldapAuthenticationProvider = ldapAuthenticationProvider;
         this.globalAdmins = globalAdmins;
         this.jwtUtil = jwtUtil;
     }
@@ -88,11 +98,34 @@ public class RestApi {
 
     //endregion
 
+    @Data
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class AuthRequest {
+        private String username;
+        private String password;
+    }
+
+    @Data
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class AuthResponse {
+        private String token;
+    }
+
     @PostMapping("/login")
-    public Mono<ResponseEntity<String>> login(Mono<Authentication> principal) {
-        return user(principal)
-                .map(jwtUtil::generateToken)
-                .map(ResponseEntity::ok)
+    public Mono<ResponseEntity<AuthResponse>> login(@RequestBody Mono<AuthRequest> request) {
+        return request.map(authRequest ->
+                ResponseEntity.ok(
+                        new AuthResponse(
+                                jwtUtil.generateToken(
+                                        (User) ldapAuthenticationProvider.authenticate(
+                                                new UsernamePasswordAuthenticationToken(
+                                                        authRequest.getUsername(),
+                                                        authRequest.getPassword()))
+                                                .getPrincipal()))))
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 

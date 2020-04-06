@@ -29,6 +29,16 @@
       "name": "admin_accounts",
       "type": "java.util.Collection<java.lang.String>",
       "description": "The global admin accounts."
+    },
+    {
+      "name": "jjwt.secret",
+      "type": "java.lang.String",
+      "description": "The secret for the JWTs."
+    },
+    {
+      "name": "jjwt.expiration",
+      "type": "java.lang.Integer",
+      "description": "The expiration time for JWTs."
     }
   ]
 }
