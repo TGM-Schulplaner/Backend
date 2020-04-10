@@ -15,7 +15,7 @@ import java.util.UUID;
 @Data
 @ToString
 @EqualsAndHashCode
-@Table("group")
+@Table("\"GROUP\"")
 public class Group {
     private @Id @Nullable UUID id;
     private @NonNull String name;

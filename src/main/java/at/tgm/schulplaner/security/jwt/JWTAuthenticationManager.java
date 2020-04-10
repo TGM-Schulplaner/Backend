@@ -1,4 +1,4 @@
-package at.tgm.schulplaner.security;
+package at.tgm.schulplaner.security.jwt;
 
 import at.tgm.schulplaner.repository.UserRepository;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -24,18 +24,14 @@ public class JWTAuthenticationManager implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        String authToken = authentication.getCredentials().toString();
-
-        String username;
         try {
-            username = jwtUtil.getUsernameFromToken(authToken);
-        } catch (Exception e) {
-            username = null;
-        }
-        if (username != null && jwtUtil.validateToken(authToken)) {
-            return userRepository.findByEmail(username).map(user -> new UsernamePasswordAuthenticationToken(user, null));
-        } else {
-            return Mono.empty();
-        }
+            String authToken = authentication.getCredentials().toString();
+            JWTToken token = jwtUtil.parseToken(authToken);
+            if (token.validateToken())
+                return userRepository
+                        .findByEmail(token.getUsername())
+                        .map(user -> new UsernamePasswordAuthenticationToken(user, null));
+        } catch (Exception ignored) {}
+        return Mono.empty();
     }
 }

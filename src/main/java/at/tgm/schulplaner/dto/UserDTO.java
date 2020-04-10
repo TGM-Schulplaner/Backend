@@ -1,15 +1,20 @@
 package at.tgm.schulplaner.dto;
 
 import at.tgm.schulplaner.model.User;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Georg Burkl
  * @version 2020-03-30
  */
-@RequiredArgsConstructor
+@Slf4j
 public class UserDTO {
     private final User user;
+
+    public UserDTO(User user) {
+        this.user = user;
+        log.info(user.toString());
+    }
 
     public String getId(){
         return user.getId().toString();

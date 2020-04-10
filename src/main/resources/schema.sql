@@ -1,4 +1,4 @@
-CREATE TABLE user (
+CREATE TABLE "USER" (
     id          UUID DEFAULT RANDOM_UUID(),
     email       VARCHAR(255),
     name        VARCHAR(255),
@@ -16,8 +16,8 @@ CREATE TABLE "GROUP" (
 
 CREATE TABLE member (
     id          UUID DEFAULT RANDOM_UUID(),
-    uid         UUID,
-    gid         UUID,
+    uid         UUID NOT NULL,
+    gid         UUID NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (uid) REFERENCES user (id),
     FOREIGN KEY (gid) REFERENCES "GROUP" (id)

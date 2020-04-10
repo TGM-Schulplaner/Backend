@@ -19,8 +19,8 @@ import java.util.UUID;
 public class Member {
 
     private @Id @Nullable UUID id;
-    private final UUID uid;
-    private final UUID gid;
+    private final @NonNull UUID uid;
+    private final @NonNull UUID gid;
     private boolean isAdmin;
 
     @PersistenceConstructor

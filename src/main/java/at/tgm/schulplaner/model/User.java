@@ -8,12 +8,8 @@ import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -27,7 +23,7 @@ import java.util.regex.Pattern;
 @ToString
 @EqualsAndHashCode
 @Table("user")
-public class User implements UserDetails {
+public class User implements UserDetailsWrapper {
 
     private static final Predicate<String> EMAIL_PREDICATE = Pattern.compile("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$").asMatchPredicate();
     public static final String STUDENT = "schueler";
@@ -59,26 +55,6 @@ public class User implements UserDetails {
     }
 
     /**
-     * Returns the authorities granted to the user. Cannot return <code>null</code>.
-     *
-     * @return the authorities, sorted by natural key (never <code>null</code>)
-     */
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptySet();
-    }
-
-    /**
-     * Returns the password used to authenticate the user.
-     *
-     * @return the password
-     */
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    /**
      * Returns the username used to authenticate the user. Cannot return <code>null</code>.
      *
      * @return the username (never <code>null</code>)
@@ -88,49 +64,4 @@ public class User implements UserDetails {
         return email;
     }
 
-    /**
-     * Indicates whether the user's account has expired. An expired account cannot be
-     * authenticated.
-     *
-     * @return <code>true</code> if the user's account is valid (ie non-expired),
-     * <code>false</code> if no longer valid (ie expired)
-     */
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    /**
-     * Indicates whether the user is locked or unlocked. A locked user cannot be
-     * authenticated.
-     *
-     * @return <code>true</code> if the user is not locked, <code>false</code> otherwise
-     */
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    /**
-     * Indicates whether the user's credentials (password) has expired. Expired
-     * credentials prevent authentication.
-     *
-     * @return <code>true</code> if the user's credentials are valid (ie non-expired),
-     * <code>false</code> if no longer valid (ie expired)
-     */
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    /**
-     * Indicates whether the user is enabled or disabled. A disabled user cannot be
-     * authenticated.
-     *
-     * @return <code>true</code> if the user is enabled, <code>false</code> otherwise
-     */
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

@@ -31,13 +31,13 @@
       "description": "The global admin accounts."
     },
     {
-      "name": "jjwt.secret",
+      "name": "jwt.secret",
       "type": "java.lang.String",
       "description": "The secret for the JWTs."
     },
     {
-      "name": "jjwt.expiration",
-      "type": "java.lang.Integer",
+      "name": "jwt.expiration",
+      "type": "java.lang.Long",
       "description": "The expiration time for JWTs."
     }
   ]

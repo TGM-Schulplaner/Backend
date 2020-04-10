@@ -43,7 +43,9 @@ public class SecurityConfig {
     @Value("${secure_endpoints}")        private Collection<String> secureEndpoints;
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
+                                                         SecurityContextRepository securityContextRepository/*,
+                                                         CorsConfigurationSource corsConfigurationSource*/) {
         return http
                 .exceptionHandling()
                 /*.authenticationEntryPoint((swe, e) ->
@@ -56,15 +58,16 @@ public class SecurityConfig {
                                         .setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
                 .cors()
-                .configurationSource(corsConfigurationSource)
+                /*.configurationSource(corsConfigurationSource)*/
                 .and()
                 .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
+                .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS).permitAll()
                 .pathMatchers("/api/v1/login").permitAll()
-                .pathMatchers(secureEndpoints.toArray(String[]::new)).authenticated()
+                /*.pathMatchers(secureEndpoints.toArray(String[]::new)).authenticated()*/
                 .anyExchange().permitAll()
                 .and()
                 .build();

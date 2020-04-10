@@ -1,4 +1,4 @@
-package at.tgm.schulplaner.security;
+package at.tgm.schulplaner.security.jwt;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
