@@ -37,6 +37,7 @@ public class JWTToken {
         private String doGenerateToken(User user) {
             Map<String, Object> claims = new HashMap<>();
             claims.put("role", user.getType());
+            claims.put("uuid", user.getId());
             return doGenerateToken(claims, user.getUsername());
         }
 

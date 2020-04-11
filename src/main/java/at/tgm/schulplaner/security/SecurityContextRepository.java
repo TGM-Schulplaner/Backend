@@ -5,6 +5,7 @@ import at.tgm.schulplaner.security.jwt.JWTAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
     private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String PUSH_TOKEN_KEY = "PushToken ";
+    private final String pushToken = "HelloWorld";
     private final JWTAuthenticationManager jwtAuthManager;
 
     public SecurityContextRepository(JWTAuthenticationManager jwtAuthManager) {
@@ -40,25 +43,30 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         ServerHttpRequest request = swe.getRequest();
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
-            log.info(request.getLocalAddress().getHostName());
-            log.info("{} {}?{}",
-                    request.getMethodValue(),
-                    request.getPath().value(),
-                    request.getQueryParams()
-                            .entrySet()
-                            .stream()
-                            .flatMap(entry -> entry
-                                    .getValue()
-                                    .stream()
-                                    .map(val -> entry.getKey()+"="+val))
-                            .collect(Collectors.joining("&")));
-            String authToken = authHeader.substring(TOKEN_PREFIX.length());
-            Authentication auth = new JWTAuthenticationToken(authToken);
-            return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
-        } else {
-            return Mono.empty();
+        if (authHeader != null) {
+            if (authHeader.startsWith(TOKEN_PREFIX)) {
+//            log.info(request.getLocalAddress().getHostName());
+                log.info("{} {}?{}",
+                        request.getMethodValue(),
+                        request.getPath().value(),
+                        request.getQueryParams()
+                                .entrySet()
+                                .stream()
+                                .flatMap(entry -> entry
+                                        .getValue()
+                                        .stream()
+                                        .map(val -> entry.getKey() + "=" + val))
+                                .collect(Collectors.joining("&")));
+                String authToken = authHeader.substring(TOKEN_PREFIX.length());
+                Authentication auth = new JWTAuthenticationToken(authToken);
+                return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
+            } else if (authHeader.startsWith(PUSH_TOKEN_KEY)) {
+                UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken("PUSH", authHeader.substring(PUSH_TOKEN_KEY.length()));
+                user.setAuthenticated(authHeader.substring(PUSH_TOKEN_KEY.length()).equals(pushToken));
+                if (user.isAuthenticated()) return Mono.just(new SecurityContextImpl(user));
+            }
         }
+        return Mono.empty();
     }
 
 }

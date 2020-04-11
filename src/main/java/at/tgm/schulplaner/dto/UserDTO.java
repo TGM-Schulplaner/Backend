@@ -13,7 +13,6 @@ public class UserDTO {
 
     public UserDTO(User user) {
         this.user = user;
-        log.info(user.toString());
     }
 
     public String getId(){

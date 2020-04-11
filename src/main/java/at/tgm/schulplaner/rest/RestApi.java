@@ -34,7 +34,7 @@ public class RestApi {
     private final UserRepository userRepo;
     private final MemberRepository memberRepo;
     private final GroupRepository groupRepo;
-    private @Value("${admin_accounts}") Collection<String> globalAdmins;
+    private @Value("${admin_accounts}") Collection<String> sysAdmins;
 
     public RestApi(UserRepository userRepo, MemberRepository memberRepo, GroupRepository groupRepo) {
         this.userRepo = userRepo;
@@ -87,7 +87,7 @@ public class RestApi {
     }
 
     private boolean isGlobalAdmin(User user) {
-        return this.globalAdmins.contains(user.getEmail());
+        return this.sysAdmins.contains(user.getEmail());
     }
 
     private Mono<User> user(Mono<Authentication> principal) {
