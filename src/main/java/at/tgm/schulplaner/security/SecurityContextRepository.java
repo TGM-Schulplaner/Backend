@@ -3,7 +3,10 @@ package at.tgm.schulplaner.security;
 import at.tgm.schulplaner.security.jwt.JWTAuthenticationManager;
 import at.tgm.schulplaner.security.jwt.JWTAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.PathContainer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,9 +14,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +31,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String PUSH_TOKEN_KEY = "PushToken ";
-    private final String pushToken = "HelloWorld";
+    private @Value("${push_service.token}") String pushToken;
     private final JWTAuthenticationManager jwtAuthManager;
 
     public SecurityContextRepository(JWTAuthenticationManager jwtAuthManager) {
@@ -60,13 +65,16 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
                 String authToken = authHeader.substring(TOKEN_PREFIX.length());
                 Authentication auth = new JWTAuthenticationToken(authToken);
                 return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
-            } else if (authHeader.startsWith(PUSH_TOKEN_KEY)) {
-                UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken("PUSH", authHeader.substring(PUSH_TOKEN_KEY.length()));
-                user.setAuthenticated(authHeader.substring(PUSH_TOKEN_KEY.length()).equals(pushToken));
-                if (user.isAuthenticated()) return Mono.just(new SecurityContextImpl(user));
+            } else if (authHeader.startsWith(PUSH_TOKEN_KEY) && authHeader.substring(PUSH_TOKEN_KEY.length()).equals(pushToken)) {
+                return Mono.just(new UsernamePasswordAuthenticationToken("PUSH", authHeader.substring(PUSH_TOKEN_KEY.length()), null)).map(SecurityContextImpl::new);
             }
         }
-        return Mono.empty();
+        List<PathContainer.Element> elements = swe.getRequest().getPath().pathWithinApplication().elements();
+        String value = elements.get(elements.size() - 1).value();
+        if (value.equals("login") || (value.equals("push"))) {
+            return Mono.empty();
+        }
+        return Mono.error(HttpClientErrorException.create(HttpStatus.UNAUTHORIZED, "Unauthorized", new HttpHeaders(), new byte[0], null));
     }
 
 }
