@@ -4,7 +4,6 @@ import at.tgm.schulplaner.repository.UserRepository;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -16,13 +15,9 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Georg Burkl
@@ -57,9 +52,9 @@ public class SecurityConfig {
                                 swe.getResponse()
                                         .setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
-                .cors()
+//                .cors()
                 /*.configurationSource(corsConfigurationSource)*/
-                .and()
+//                .and()
                 .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
@@ -73,7 +68,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
+    /*@Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("*"));
@@ -82,7 +77,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
+    }*/
 
     /*@Bean
     ReactiveAuthenticationManager authenticationManager(ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider) {
@@ -96,11 +91,6 @@ public class SecurityConfig {
             adLdap.setSearchFilter(adSearchFilter);
         adLdap.setUserDetailsContextMapper(new CustomLdapUserDetailsMapper(repository));
         return adLdap;
-    }
-
-    @Bean
-    WebFluxProperties webFluxProperties() {
-        return new WebFluxProperties();
     }
 
     /**

@@ -61,3 +61,5 @@ CREATE TABLE todo_item (
     PRIMARY KEY (id),
     FOREIGN KEY (list) REFERENCES todo_list (id)
 );
+
+INSERT INTO user (id, name, email, type, department) VALUES ('952382dc-063b-4d67-b394-400f1e274dc4', 'Georg Burkl', 'gburkl@student.tgm.ac.at', 'schueler', '3DHIT');

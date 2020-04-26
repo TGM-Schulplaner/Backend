@@ -14,10 +14,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +74,9 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         if (value.equals("login") || (value.equals("push"))) {
             return Mono.empty();
         }
-        return Mono.error(HttpClientErrorException.create(HttpStatus.UNAUTHORIZED, "Unauthorized", new HttpHeaders(), new byte[0], null));
+        swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        swe.getResponse().bufferFactory().allocateBuffer().write("Unauthorized", Charset.defaultCharset());
+        return Mono.empty(/*WebClientResponseException.create(HttpStatus.UNAUTHORIZED, "Unauthorized", new HttpHeaders(), new byte[0], null)*/);
     }
 
 }

@@ -9,7 +9,7 @@ import at.tgm.schulplaner.repository.MemberRepository;
 import at.tgm.schulplaner.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -25,7 +25,6 @@ import java.util.UUID;
 @SuppressWarnings("ConstantConditions")
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/v1")
 //@RequiredArgsConstructor
 public class RestApi {
@@ -74,10 +73,8 @@ public class RestApi {
     }
 
     @GetMapping("/users")
-    public Flux<UserDTO> searchForUser(@RequestParam(value = "q",    required = false, defaultValue = "") String q,
-                                       @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        return userRepo.findAllByEmailContainsIgnoreCaseOrNameContainsIgnoreCase(q, q, PageRequest.of(page, size)).map(UserDTO::new);
+    public Flux<UserDTO> searchForUser(@RequestParam(value = "q", required = false, defaultValue = "") String q, Pageable pageable) {
+        return userRepo.findAllByEmailContainsIgnoreCaseOrNameContainsIgnoreCase(q, q, pageable).map(UserDTO::new);
     }
 
     //region helpers
