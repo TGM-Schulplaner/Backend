@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.3.0.M4'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.asciidoctor.convert' version '1.5.8'
+    id 'net.minecrell.licenser' version '0.4.1'
     id 'java'
     id 'war'
 }
@@ -64,6 +65,14 @@ asciidoctor {
 
 springBoot {
     mainClassName = 'at.tgm.schulplaner.TgmSchulplanerApplication'
+}
+
+license {
+    header = project.file('LICENSE_HEADER')
+    ext {
+        name = 'tgm - Die Schule der Technik'
+        year = 2020
+    }
 }
 
 /*tasks.withType(JavaCompile) {
