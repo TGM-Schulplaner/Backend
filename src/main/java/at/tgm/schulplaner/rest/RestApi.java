@@ -17,12 +17,8 @@
 package at.tgm.schulplaner.rest;
 
 import at.tgm.schulplaner.dto.UserDTO;
-import at.tgm.schulplaner.model.Group;
-import at.tgm.schulplaner.model.Member;
-import at.tgm.schulplaner.model.User;
-import at.tgm.schulplaner.repository.GroupRepository;
-import at.tgm.schulplaner.repository.MemberRepository;
-import at.tgm.schulplaner.repository.UserRepository;
+import at.tgm.schulplaner.model.*;
+import at.tgm.schulplaner.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -50,11 +47,15 @@ public class RestApi {
     private final MemberRepository memberRepo;
     private final GroupRepository groupRepo;
     private @Value("${admin_accounts}") Collection<String> sysAdmins;
+    private final CalendarRepository calendarRepo;
+    private final CalendarEntryRepository calendarEntryRepository;
 
-    public RestApi(UserRepository userRepo, MemberRepository memberRepo, GroupRepository groupRepo) {
+    public RestApi(UserRepository userRepo, MemberRepository memberRepo, GroupRepository groupRepo, CalendarRepository calendarRepo, CalendarEntryRepository calendarEntryRepository) {
         this.userRepo = userRepo;
         this.memberRepo = memberRepo;
         this.groupRepo = groupRepo;
+        this.calendarRepo = calendarRepo;
+        this.calendarEntryRepository = calendarEntryRepository;
     }
 
     //endregion
@@ -89,8 +90,40 @@ public class RestApi {
     }
 
     @GetMapping("/users")
-    public Flux<UserDTO> searchForUser(@RequestParam(value = "q", required = false, defaultValue = "") String q, Pageable pageable) {
-        return userRepo.findAllByEmailContainsIgnoreCaseOrNameContainsIgnoreCase(q, q, pageable).map(UserDTO::new);
+    public Flux<UserDTO> searchForUser(Mono<Authentication> principal, @RequestParam(value = "q", required = false, defaultValue = "") String q, Pageable pageable) {
+        return principal
+                .flatMapMany(p -> userRepo.findAllByEmailContainsIgnoreCaseOrNameContainsIgnoreCase(q, q, pageable)
+                .map(UserDTO::new));
+    }
+
+    @GetMapping("/calendar/{id}")
+    public Mono<Calendar> getCalendar(Mono<Authentication> principal, @PathVariable String id) {
+        return user(principal).flatMap(u -> calendarRepo
+                .findById(UUID.fromString(id))
+                .filterWhen(calendar -> Mono.just(calendar.getOwner().equals(u.getId()))
+                        .filter(Boolean::booleanValue)
+                        .switchIfEmpty(groupRepo
+                                .findById(calendar.getOwner())
+                                .map(Group::getId)
+                                .flatMapMany(memberRepo::getAllByGid)
+                                .map(Member::getUid)
+                                .map(uuid -> uuid.equals(calendar.getOwner()))
+                                .filter(Boolean::booleanValue)
+                                .next())));
+    }
+
+    @GetMapping("/calendar/{id}/entries")
+    public Flux<CalendarEntry> getCalendarEntries(Mono<Authentication> principal,
+                                                  @PathVariable String id,
+                                                  @RequestParam(value = "start", required = false) String start,
+                                                  @RequestParam(value = "end", required = false) String end) {
+        if (start != null && end != null) {
+            return getCalendar(principal, id)
+                    .map(Calendar::getId)
+                    .flatMapMany(c -> calendarEntryRepository
+                            .findAllByCalendarAndStartIsLessThanEqualAndEndIsGreaterThanEqual(c, LocalDateTime.parse(end), LocalDateTime.parse(start)));
+        }
+        return calendarEntryRepository.findAllByCalendar(getCalendar(principal, id).map(Calendar::getId));
     }
 
     //region helpers

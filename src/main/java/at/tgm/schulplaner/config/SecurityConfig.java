@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package at.tgm.schulplaner.security;
+package at.tgm.schulplaner.config;
 
 import at.tgm.schulplaner.repository.UserRepository;
+import at.tgm.schulplaner.security.CustomLdapUserDetailsMapper;
+import at.tgm.schulplaner.security.SecurityContextRepository;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +80,7 @@ public class SecurityConfig {
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS).permitAll()
                 .pathMatchers("/api/v1/login").permitAll()
-                /*.pathMatchers(secureEndpoints.toArray(String[]::new)).authenticated()*/
+//                .pathMatchers(secureEndpoints.toArray(String[]::new)).authenticated()
                 .anyExchange().permitAll()
                 .and()
                 .build();

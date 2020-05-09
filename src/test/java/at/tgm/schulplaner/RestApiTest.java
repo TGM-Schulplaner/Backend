@@ -12,25 +12,56 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 
 package at.tgm.schulplaner;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.Extensions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import springfox.documentation.spring.web.SpringfoxTemplateFormat;
 
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
+
+*/
 /**
  * @author Georg Burkl
  * @version 2020-04-21
- */
-@ExtendWith(SpringExtension.class)
+ *//*
+
+@ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 @WebFluxTest
 @ContextConfiguration
 class RestApiTest {
+    */
+/*private WebTestClient webClient;
+
     @Autowired
-    private WebTestClient webClient;
+    private ApplicationContext context;*//*
+
+
+    @BeforeEach
+    void setup(RestDocumentationContextProvider restDocumentation) {
+        */
+/*this.webClient = WebTestClient.bindToApplicationContext(this.context)
+                .configureClient()
+                .baseUrl("https://api.example.com")
+                .filter(documentationConfiguration(restDocumentation).snippets()
+                        .withTemplateFormat(new SpringfoxTemplateFormat()))   // <-- Template format
+                .build();*//*
+
+    }
 }
+*/

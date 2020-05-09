@@ -37,27 +37,27 @@ public class CalendarEntry {
 
     private @Id @Nullable UUID id;
     private final UUID calendar;
-    private @NonNull String name;
+    private @NonNull String title;
     private @NonNull String description;
-    private @NonNull LocalDateTime begin;
+    private @NonNull LocalDateTime start;
     private @NonNull LocalDateTime end;
 
     @PersistenceConstructor
-    public CalendarEntry(@Nullable UUID id, @NonNull UUID calendar, @NonNull String name, @NonNull String description, @NonNull LocalDateTime begin, @NonNull LocalDateTime end) {
+    public CalendarEntry(@Nullable UUID id, @NonNull UUID calendar, @NonNull String title, @NonNull String description, @NonNull LocalDateTime start, @NonNull LocalDateTime end) {
         Assert.notNull(calendar, "Calendar id must not be null!");
-        Assert.hasText(name, "Name must not be empty!");
+        Assert.hasText(title, "Title must not be empty!");
         Assert.notNull(description, "Description must not be null (but may be empty)!");
-        Assert.notNull(begin, "Begin date time must not be null!");
+        Assert.notNull(start, "Start date time must not be null!");
         Assert.notNull(end, "End date time must not be null!");
         this.id = id;
         this.calendar = calendar;
-        this.name = name;
+        this.title = title;
         this.description = description;
-        this.begin = begin;
+        this.start = start;
         this.end = end;
     }
 
-    public CalendarEntry(@NonNull UUID calendar, @NonNull String name, @NonNull String description, @NonNull LocalDateTime begin, @NonNull LocalDateTime end) {
-        this(null, calendar, name, description, begin, end);
+    public CalendarEntry(@NonNull UUID calendar, @NonNull String title, @NonNull String description, @NonNull LocalDateTime start, @NonNull LocalDateTime end) {
+        this(null, calendar, title, description, start, end);
     }
 }

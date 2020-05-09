@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package at.tgm.schulplaner;
+package at.tgm.schulplaner.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
