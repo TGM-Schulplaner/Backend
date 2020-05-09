@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
+ * This class handles the login procedure
+ *
  * @author Georg Burkl
  * @version 2020-04-08
  */
@@ -38,7 +40,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
-public class AuthRest {
+public class AuthApi {
 
     private final ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider;
     private final JWTUtil jwtUtil;

@@ -19,12 +19,11 @@ package at.tgm.schulplaner.repository;
 import at.tgm.schulplaner.model.CalendarEntry;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface CalendarEntryRepository extends ReactiveCrudRepository<CalendarEntry, UUID> {
-    Flux<CalendarEntry> findAllByCalendar(Mono<UUID> calendar);
+    Flux<CalendarEntry> findAllByCalendar(UUID calendar);
     Flux<CalendarEntry> findAllByCalendarAndStartIsLessThanEqualAndEndIsGreaterThanEqual(UUID calendar, LocalDateTime start, LocalDateTime end);
 }

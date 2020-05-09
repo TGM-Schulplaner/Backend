@@ -36,7 +36,7 @@ import java.util.Objects;
  * @version 2020-04-26
  */
 @Configuration
-public class WebConfiguration implements WebFluxConfigurer {
+public class WebConfig implements WebFluxConfigurer {
     @Override
     public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
         configurer.addCustomResolver(new HandlerMethodArgumentResolver() {

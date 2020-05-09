@@ -38,7 +38,7 @@ import java.util.stream.BaseStream;
 @Slf4j
 @Profile("dev")
 @Configuration
-public class DataSourceConfiguration {
+public class DataSourceConfig {
 
     @Bean
     public ApplicationRunner seeder(DatabaseClient client) {
