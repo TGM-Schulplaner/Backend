@@ -17,8 +17,6 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -36,8 +34,6 @@ import java.util.regex.Pattern;
  * @version 2020-03-22
  */
 @Data
-@ToString
-@EqualsAndHashCode
 @Table("user")
 public class User implements UserDetailsWrapper {
 

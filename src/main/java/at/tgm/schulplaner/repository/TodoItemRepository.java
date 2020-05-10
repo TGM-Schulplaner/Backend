@@ -24,6 +24,5 @@ import reactor.core.publisher.Flux;
 import java.util.UUID;
 
 public interface TodoItemRepository extends ReactiveCrudRepository<TodoItem, UUID> {
-    //@Query("SELECT * FROM todo_item WHERE todo_item.todo_list = :list")
     Flux<TodoItem> findAllByList(@NonNull UUID list);
 }

@@ -18,6 +18,7 @@ package at.tgm.schulplaner.auth;
 
 import at.tgm.schulplaner.model.User;
 import at.tgm.schulplaner.security.jwt.JWTUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,10 +42,10 @@ import reactor.core.publisher.Mono;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class AuthApi {
-
     private final ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider;
     private final JWTUtil jwtUtil;
 
+    @Operation(summary = "Login", tags = {"auth"})
     @PostMapping("/api/v1/login")
     public Mono<ResponseEntity<AuthResponse>> login(@RequestBody Mono<AuthRequest> request) {
         return request.map(authRequest ->

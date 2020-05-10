@@ -19,9 +19,8 @@ package at.tgm.schulplaner.config;
 import at.tgm.schulplaner.repository.UserRepository;
 import at.tgm.schulplaner.security.CustomLdapUserDetailsMapper;
 import at.tgm.schulplaner.security.SecurityContextRepository;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -35,25 +34,19 @@ import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAu
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
-
 /**
  * @author Georg Burkl
  * @version 2020-03-05
  */
 @Slf4j
 @Configuration
-@PropertySource("classpath:application_template.yml")
-@NoArgsConstructor
+@PropertySource("classpath:application.yml")
+@RequiredArgsConstructor
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-
-    @Value("${active_directory.url}")    private String adUrl;
-    @Value("${active_directory.domain}") private String adDomain;
-    @Value("${active_directory.root}")   private String adRoot;
-    @Value("${active_directory.filter}") private String adSearchFilter;
-    @Value("${secure_endpoints}")        private Collection<String> secureEndpoints;
+    private final ConfigProperties properties;
+    private final ActiveDirectoryConfig activeDirectoryConfig;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
@@ -61,10 +54,10 @@ public class SecurityConfig {
                                                          CorsConfigurationSource corsConfigurationSource*/) {
         return http
                 .exceptionHandling()
-                /*.authenticationEntryPoint((swe, e) ->
+                .authenticationEntryPoint((swe, e) ->
                         Mono.fromRunnable(() ->
                                 swe.getResponse()
-                                        .setStatusCode(HttpStatus.UNAUTHORIZED)))*/
+                                        .setStatusCode(HttpStatus.UNAUTHORIZED)))
                 .accessDeniedHandler((swe, e) ->
                         Mono.fromRunnable(() ->
                                 swe.getResponse()
@@ -81,8 +74,8 @@ public class SecurityConfig {
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS).permitAll()
                 .pathMatchers("/api/v1/login").permitAll()
-                .pathMatchers("/webjars/swagger-ui/**").permitAll()
-//                .pathMatchers(secureEndpoints.toArray(String[]::new)).authenticated()
+                .pathMatchers("/webjars/**").permitAll()
+//                .pathMatchers(properties.getSecureEndpoints().toArray(String[]::new)).authenticated()
                 .anyExchange().permitAll()
                 .and()
                 .build();
@@ -106,9 +99,12 @@ public class SecurityConfig {
 
     @Bean
     ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider(UserRepository repository) {
-        ActiveDirectoryLdapAuthenticationProvider adLdap = new ActiveDirectoryLdapAuthenticationProvider(adDomain, adUrl, adRoot);
-        if (!adSearchFilter.isBlank())
-            adLdap.setSearchFilter(adSearchFilter);
+        ActiveDirectoryLdapAuthenticationProvider adLdap = new ActiveDirectoryLdapAuthenticationProvider(
+                activeDirectoryConfig.getDomain(),
+                activeDirectoryConfig.getUrl(),
+                activeDirectoryConfig.getRoot());
+        if (!activeDirectoryConfig.getFilter().isBlank())
+            adLdap.setSearchFilter(activeDirectoryConfig.getFilter());
         adLdap.setUserDetailsContextMapper(new CustomLdapUserDetailsMapper(repository));
         return adLdap;
     }

@@ -17,7 +17,6 @@
 package at.tgm.schulplaner.security.jwt;
 
 import at.tgm.schulplaner.model.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -33,9 +32,8 @@ public class JWTUtil implements Serializable {
 
     private final JWTToken.Generator generator;
 
-    public JWTUtil(@Value("${jwt.secret}") String secret,
-                   @Value("${jwt.expiration}") long expirationTime) {
-        this.generator = new JWTToken.Generator(secret, expirationTime);
+    public JWTUtil(JWTProperties properties) {
+        this.generator = new JWTToken.Generator(properties.getSecret(), properties.getExpiration());
     }
 
     public JWTToken generateToken(User user) {

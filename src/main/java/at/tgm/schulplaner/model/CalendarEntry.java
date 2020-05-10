@@ -17,8 +17,6 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -30,8 +28,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@ToString
-@EqualsAndHashCode
 @Table("calendar_entry")
 public class CalendarEntry {
 

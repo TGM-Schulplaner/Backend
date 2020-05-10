@@ -16,25 +16,24 @@
 
 package at.tgm.schulplaner.security;
 
+import at.tgm.schulplaner.config.ConfigProperties;
 import at.tgm.schulplaner.security.jwt.JWTAuthenticationManager;
 import at.tgm.schulplaner.security.jwt.JWTAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -46,18 +45,14 @@ import java.util.stream.Collectors;
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
     private static final String TOKEN_PREFIX = "Bearer ";
-    private static final String PUSH_TOKEN_KEY = "PushToken ";
-    private @Value("${push_service.token}") String pushToken;
     private final JWTAuthenticationManager jwtAuthManager;
-    private final Collection<String> ignored = Arrays.asList(
-            "/api/v1/push",
-            "/api/v1/login",
-            "/doc-data/swagger-config",
-            "/doc-data",
-            "/doc");
+    private final AntPathMatcher antMatcher;
+    private final ConfigProperties properties;
 
-    public SecurityContextRepository(JWTAuthenticationManager jwtAuthManager) {
+    public SecurityContextRepository(JWTAuthenticationManager jwtAuthManager, ConfigProperties properties) {
         this.jwtAuthManager = jwtAuthManager;
+        this.properties = properties;
+        antMatcher = new AntPathMatcher();
     }
 
     @Override
@@ -87,12 +82,10 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
                 String authToken = authHeader.substring(TOKEN_PREFIX.length());
                 Authentication auth = new JWTAuthenticationToken(authToken);
                 return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
-            } else if (authHeader.startsWith(PUSH_TOKEN_KEY) && authHeader.substring(PUSH_TOKEN_KEY.length()).equals(pushToken)) {
-                return Mono.just(new UsernamePasswordAuthenticationToken("PUSH", authHeader.substring(PUSH_TOKEN_KEY.length()), null)).map(SecurityContextImpl::new);
             }
         }
         String path = swe.getRequest().getPath().pathWithinApplication().value();
-        if (ignored.contains(path) || path.startsWith("/webjars")) {
+        if (properties.getIgnoredPaths().stream().anyMatch(pattern -> antMatcher.match(pattern, path)) || ("/api/v1/push".equals(path) && swe.getRequest().getMethod() == HttpMethod.GET)) {
             return Mono.empty();
         }
         swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

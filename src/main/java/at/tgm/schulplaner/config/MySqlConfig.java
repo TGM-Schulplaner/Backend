@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
@@ -23,7 +22,6 @@ import java.util.UUID;
  * @version 2020-05-09
  */
 @Slf4j
-@Profile("!dev")
 @Configuration
 public class MySqlConfig extends AbstractR2dbcConfiguration {
 
