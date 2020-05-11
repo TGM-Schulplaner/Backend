@@ -65,24 +65,22 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         ServerHttpRequest request = swe.getRequest();
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-        if (authHeader != null) {
-            if (authHeader.startsWith(TOKEN_PREFIX)) {
+        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
 //            log.info(request.getLocalAddress().getHostName());
-                log.info("{} {}?{}",
-                        request.getMethodValue(),
-                        request.getPath().value(),
-                        request.getQueryParams()
-                                .entrySet()
-                                .stream()
-                                .flatMap(entry -> entry
-                                        .getValue()
-                                        .stream()
-                                        .map(val -> entry.getKey() + "=" + val))
-                                .collect(Collectors.joining("&")));
-                String authToken = authHeader.substring(TOKEN_PREFIX.length());
-                Authentication auth = new JWTAuthenticationToken(authToken);
-                return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
-            }
+            log.info("{} {}?{}",
+                    request.getMethodValue(),
+                    request.getPath().value(),
+                    request.getQueryParams()
+                            .entrySet()
+                            .stream()
+                            .flatMap(entry -> entry
+                                    .getValue()
+                                    .stream()
+                                    .map(val -> entry.getKey() + "=" + val))
+                            .collect(Collectors.joining("&")));
+            String authToken = authHeader.substring(TOKEN_PREFIX.length());
+            Authentication auth = new JWTAuthenticationToken(authToken);
+            return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
         }
         String path = swe.getRequest().getPath().pathWithinApplication().value();
         if (properties.getIgnoredPaths().stream().anyMatch(pattern -> antMatcher.match(pattern, path)) || ("/api/v1/push".equals(path) && swe.getRequest().getMethod() == HttpMethod.GET)) {

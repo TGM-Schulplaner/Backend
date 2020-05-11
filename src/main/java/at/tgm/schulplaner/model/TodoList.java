@@ -17,6 +17,7 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
+import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -45,5 +46,26 @@ public class TodoList {
 
     public TodoList(@NonNull UUID owner, @NonNull String title) {
         this(null, owner, title);
+    }
+
+    @Value
+    public static class NewTodoList {
+        @NonNull String title;
+
+        public TodoList asTodoList(UUID owner) {
+            return new TodoList(owner, title);
+        }
+    }
+
+    @Value
+    public static class ModifyTodoList {
+        @Nullable String title;
+
+        public TodoList modify(TodoList todoList) {
+            if (title != null && !title.equals(todoList.title)) {
+                todoList.setTitle(title);
+            }
+            return todoList;
+        }
     }
 }

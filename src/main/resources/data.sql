@@ -1,7 +1,7 @@
 USE schulplaner;
 
 INSERT INTO user (id, name, email, type, department) VALUES ('952382dc-063b-4d67-b394-400f1e274dc4', 'Georg Burkl', 'gburkl@student.tgm.ac.at', 'schueler', '3DHIT');
-INSERT INTO `group` (id, name, description) VALUES ('9816248b-929c-11ea-9fd5-5048494f4e43', 'TGM Schulplaner', 'TGM Schulplaner ITP Gruppe');
+INSERT INTO `group` (id, name, description, settings) VALUES ('9816248b-929c-11ea-9fd5-5048494f4e43', 'TGM Schulplaner', 'TGM Schulplaner ITP Gruppe', 'CALENDAR=READ,CALENDAR_ENTRY=READ,TODO_LIST=READ,TODO_ITEM=READ');
 INSERT INTO member (id, uid, gid) VALUES ('e18d9b3f-929d-11ea-9fd5-5048494f4e43', '952382dc-063b-4d67-b394-400f1e274dc4', '9816248b-929c-11ea-9fd5-5048494f4e43');
 
 INSERT INTO calendar (id, owner, name) VALUE ('57162059-91d4-11ea-9fd5-5048494f4e43', '9816248b-929c-11ea-9fd5-5048494f4e43', 'Test Calendar');

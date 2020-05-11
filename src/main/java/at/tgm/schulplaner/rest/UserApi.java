@@ -21,7 +21,6 @@ import java.util.UUID;
  * @author Georg Burkl
  * @version 2020-05-10
  */
-@SuppressWarnings("ReactiveStreamsNullableInLambdaInTransform")
 @Slf4j
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -54,8 +53,8 @@ public class UserApi {
     @Operation(tags = {"group", "user"}, summary = "Get all users that are a member of the group if the authenticated user has access", security = @SecurityRequirement(name= "BEARER KEY"))
     @GetMapping("/group/{gid}/users")
     public Flux<UserDTO> getGroupUsers(@AuthenticationPrincipal Mono<User> principal, @PathVariable UUID gid) {
-        return dataManager.filterGroupID(principal, gid)
-                .flatMapMany(dataManager.getMemberRepo()::getAllByGid)
+        return principal.filterWhen(user -> dataManager.hasAccessToGroup(user, gid, DataManager.AccessType.READ, DataManager.AccessEntity.GROUP))
+                .thenMany(dataManager.getMemberRepo().getAllByGid(gid))
                 .map(Member::getUid)
                 .flatMap(dataManager.getUserRepo()::findById)
                 .map(UserDTO::new);

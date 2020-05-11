@@ -17,6 +17,7 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
+import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -51,5 +52,27 @@ public class Member {
 
     public Member(@NonNull UUID uid, @NonNull UUID gid) {
         this(null, uid, gid, false);
+    }
+
+    @Value
+    public static class NewMember {
+        @NonNull UUID uid;
+        @Nullable Boolean admin;
+
+        public Member asMember(UUID gid) {
+            return new Member(uid, gid, admin != null && admin);
+        }
+    }
+
+    @Value
+    public static class ModifyMember {
+        @Nullable Boolean admin;
+
+        public Member modify(Member member) {
+            if (admin != null && admin != member.isAdmin) {
+                member.setAdmin(admin);
+            }
+            return member;
+        }
     }
 }

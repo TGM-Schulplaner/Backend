@@ -17,6 +17,7 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
+import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -45,5 +46,26 @@ public class Calendar {
 
     public Calendar(@NonNull UUID owner, @NonNull String name) {
         this(null, owner, name);
+    }
+
+    @Value
+    public static class NewCalendar {
+        @NonNull String name;
+
+        public Calendar asCalendar(UUID owner) {
+            return new Calendar(owner, name);
+        }
+    }
+
+    @Value
+    public static class ModifyCalendar {
+        @Nullable String name;
+
+        public Calendar modify(Calendar calendar) {
+            if (name != null && !name.equals(calendar.name)) {
+                calendar.setName(name);
+            }
+            return calendar;
+        }
     }
 }

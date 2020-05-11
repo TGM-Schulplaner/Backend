@@ -17,6 +17,7 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
+import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -55,5 +56,41 @@ public class CalendarEntry {
 
     public CalendarEntry(@NonNull UUID calendar, @NonNull String title, @NonNull String description, @NonNull LocalDateTime start, @NonNull LocalDateTime end) {
         this(null, calendar, title, description, start, end);
+    }
+
+    @Value
+    public static class NewCalendarEntry {
+        @NonNull String title;
+        @NonNull String description;
+        @NonNull LocalDateTime start;
+        @NonNull LocalDateTime end;
+
+        public CalendarEntry asCalendarEntry(UUID calendar) {
+            return new CalendarEntry(calendar, title, description, start, end);
+        }
+    }
+
+    @Value
+    public static class ModifyCalendarEntry {
+        @Nullable String title;
+        @Nullable String description;
+        @Nullable LocalDateTime start;
+        @Nullable LocalDateTime end;
+
+        public CalendarEntry modify(CalendarEntry entry) {
+            if (title != null && !title.equals(entry.title)) {
+                entry.setTitle(title);
+            }
+            if (description != null && !description.equals(entry.description)) {
+                entry.setDescription(description);
+            }
+            if (start != null && !start.equals(entry.start)) {
+                entry.setStart(start);
+            }
+            if (end != null && !end.equals(entry.end)) {
+                entry.setEnd(end);
+            }
+            return entry;
+        }
     }
 }

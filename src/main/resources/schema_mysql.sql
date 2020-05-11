@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `group` (
     id          VARCHAR(36) DEFAULT (UUID()),
     name        VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
+    settings    VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES entity(id)
 );

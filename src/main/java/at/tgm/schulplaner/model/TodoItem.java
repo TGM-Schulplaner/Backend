@@ -17,6 +17,7 @@
 package at.tgm.schulplaner.model;
 
 import lombok.Data;
+import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.relational.core.mapping.Table;
@@ -54,4 +55,40 @@ public class TodoItem {
     }
 
     public enum Status implements Serializable { UNSTARTED, IN_PROGRESS, DONE, FAILED }
+
+    @Value
+    public static class NewTodoItem {
+        @NonNull String name;
+        @NonNull String description;
+
+        public TodoItem asTodoItem(UUID list) {
+            return new TodoItem(list, name, description, Status.UNSTARTED);
+        }
+    }
+
+    @Value
+    public static class ModifyTodoItem {
+        @Nullable String name;
+        @Nullable String description;
+
+        public TodoItem modify(TodoItem todoItem) {
+            if (name != null && !name.equals(todoItem.name)) {
+                todoItem.setName(name);
+            }
+            if (description != null && !description.equals(todoItem.description)) {
+                todoItem.setDescription(description);
+            }
+            return todoItem;
+        }
+    }
+
+    @Value
+    public static class ModifyTodoItemStatus {
+        @NonNull Status status;
+
+        public TodoItem modify(TodoItem todoItem) {
+            todoItem.setStatus(status);
+            return todoItem;
+        }
+    }
 }
