@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2020 tgm - Die Schule der Technik
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package at.tgm.schulplaner.rest;
 
 import at.tgm.schulplaner.model.Group;
@@ -29,7 +45,7 @@ import java.util.UUID;
 public class GroupApi {
     private final DataManager dataManager;
 
-    @Operation(tags = {"group"}, summary = "Get all groups the authenticated user is a member of", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Get all groups the authenticated user is a member of", security = @SecurityRequirement(name= "bearer-key"))
     @GetMapping("/groups")
     public Flux<Group> getGroups(@AuthenticationPrincipal Mono<User> principal) {
         return principal
@@ -39,14 +55,14 @@ public class GroupApi {
                         .filterWhen(group -> dataManager.hasAccessToGroup(user, group, DataManager.AccessType.READ, DataManager.AccessEntity.GROUP)));
     }
 
-    @Operation(tags = {"group"}, summary = "Get a group by its id if the authenticated user has access", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Get a group by its id if the authenticated user has access", security = @SecurityRequirement(name= "bearer-key"))
     @GetMapping("/group/{gid}")
     public Mono<Group> getGroup(@AuthenticationPrincipal Mono<User> principal, @PathVariable UUID gid) {
         return dataManager.getGroup(principal, gid, DataManager.AccessType.READ);
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Operation(tags = {"group"}, summary = "Create a group", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Create a group", security = @SecurityRequirement(name= "bearer-key"))
     @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/group")
@@ -60,7 +76,7 @@ public class GroupApi {
                 }));
     }
 
-    @Operation(tags = {"group"}, summary = "Modify a group by id", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Modify a group by id", security = @SecurityRequirement(name= "bearer-key"))
     @PutMapping("/group/{gid}")
     public Mono<Group> modifyGroup(@AuthenticationPrincipal Mono<User> principal, @PathVariable UUID gid, @RequestBody Group.ModifyGroup newGroup) {
         return dataManager
@@ -69,7 +85,7 @@ public class GroupApi {
                 .flatMap(dataManager.getGroupRepo()::save);
     }
 
-    @Operation(tags = {"group"}, summary = "Modify a group member for a group", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Modify a group member for a group", security = @SecurityRequirement(name= "bearer-key"))
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/group/{gid}/member/{uid}")
     public Mono<Void> modifyMember(@AuthenticationPrincipal Mono<User> principal, @PathVariable UUID gid, @PathVariable UUID uid, @RequestBody Member.ModifyMember modifyMember) {
@@ -83,7 +99,7 @@ public class GroupApi {
                         .flatMap(dataManager.getMemberRepo()::save)).then();
     }
 
-    @Operation(tags = {"group"}, summary = "Modify a group member for a group", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Modify a group member for a group", security = @SecurityRequirement(name= "bearer-key"))
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/group/{gid}/member")
     public Mono<Void> createMember(@AuthenticationPrincipal Mono<User> principal, @PathVariable UUID gid, @RequestBody Member.NewMember newMember) {
@@ -95,7 +111,7 @@ public class GroupApi {
                 .then();
     }
 
-    @Operation(tags = {"group"}, summary = "Modify a group by id", security = @SecurityRequirement(name= "BEARER KEY"))
+    @Operation(tags = {"group"}, summary = "Modify a group by id", security = @SecurityRequirement(name= "bearer-key"))
     @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/group/{gid}/member")

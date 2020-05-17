@@ -1,0 +1,1831 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TGM Schulplaner API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/v1/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/calendar/{id}": {
+      "get": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Get calendar by id",
+        "operationId": "getCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calendar"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Modify calendar by id",
+        "operationId": "modifyCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyCalendar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calendar"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Delete calendar by id",
+        "operationId": "deleteCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/calendar/{id}/entries": {
+      "get": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Get all entries for a calendar by id, filtered by start and end",
+        "operationId": "getCalendarEntries",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CalendarEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/user/calendars": {
+      "get": {
+        "tags": [
+          "user",
+          "calendar"
+        ],
+        "summary": "Get all calendars that belong to the authenticated user",
+        "operationId": "getCalendarsForUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Calendar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/user/calendar": {
+      "post": {
+        "tags": [
+          "user",
+          "calendar"
+        ],
+        "summary": "Create new calendar that belongs to the group if the authenticated user has access",
+        "operationId": "createCalendarForUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCalendar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calendar"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/calendar/{calendarId}/entry/{id}": {
+      "put": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Modify an entry for a calendar by id",
+        "operationId": "modifyCalendarEntry",
+        "parameters": [
+          {
+            "name": "calendarId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyCalendarEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Create a new entry for a calendar by id",
+        "operationId": "deleteCalendarEntry",
+        "parameters": [
+          {
+            "name": "calendarId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/calendars": {
+      "get": {
+        "tags": [
+          "group",
+          "calendar"
+        ],
+        "summary": "Get all calendars that belong to the group if the authenticated user has access",
+        "operationId": "getCalendarsForGroup",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Calendar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/calendar": {
+      "post": {
+        "tags": [
+          "group",
+          "calendar"
+        ],
+        "summary": "Create new calendar that belongs to the group if the authenticated user has access",
+        "operationId": "createCalendarForGroup",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCalendar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calendar"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/calendar/{id}/entry": {
+      "post": {
+        "tags": [
+          "calendar"
+        ],
+        "summary": "Create a new entry for a calendar by id",
+        "operationId": "createCalendarEntry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCalendarEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEntry"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Get a group by its id if the authenticated user has access",
+        "operationId": "getGroup",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Modify a group by id",
+        "operationId": "modifyGroup",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyGroup"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group": {
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Create a group",
+        "operationId": "createGroup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewGroup"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/member/{uid}": {
+      "put": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Modify a group member for a group",
+        "operationId": "modifyMember",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyMember"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/member": {
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Modify a group member for a group",
+        "operationId": "createMember",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewMember"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Modify a group by id",
+        "operationId": "modifyMember_1",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "user",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/groups": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Get all groups the authenticated user is a member of",
+        "operationId": "getGroups",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Group"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/push": {
+      "get": {
+        "tags": [
+          "push"
+        ],
+        "summary": "SSE endpoint for the push event service",
+        "operationId": "getPush",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServerSentEventString"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "push"
+        ],
+        "summary": "Send endpoint for the push event service",
+        "operationId": "push",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/todo_list/{id}": {
+      "get": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Get todo list by id",
+        "operationId": "getTodoList",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Get todo list by id",
+        "operationId": "modifyTodoList",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyTodoList"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Get todo list by id",
+        "operationId": "deleteTodoList",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/user/todo_list": {
+      "post": {
+        "tags": [
+          "user",
+          "todo"
+        ],
+        "summary": "Create a new todo list that belong to the authenticated user",
+        "operationId": "createTodoListForUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTodoList"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/todo_lists": {
+      "get": {
+        "tags": [
+          "group",
+          "todo"
+        ],
+        "summary": "Get all todo lists that belong to the group if the authenticated user has access",
+        "operationId": "getTodoListsForGroup",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TodoList"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/todo_list": {
+      "post": {
+        "tags": [
+          "group",
+          "todo"
+        ],
+        "summary": "Create a new todo list that belongs to the group if the authenticated user has access",
+        "operationId": "createTodoListForGroup",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTodoList"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/user/todo_lists": {
+      "get": {
+        "tags": [
+          "user",
+          "todo"
+        ],
+        "summary": "Get all todo lists that belong to the authenticated user",
+        "operationId": "getTodoListsForUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TodoList"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/todo_list/{id}/item": {
+      "post": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Create a new item for todo list by id",
+        "operationId": "createTodoItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTodoItem"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoItem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/todo_list/{id}/items": {
+      "get": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Get all items from todo list by id",
+        "operationId": "getTodoItems",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TodoItem"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/todo_list/{listId}/item/{id}/status": {
+      "put": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Modify an item for todo list by id",
+        "operationId": "modifyTodoItem",
+        "parameters": [
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyTodoItemStatus"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoItem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/todo_list/{listId}/item/{id}": {
+      "put": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Modify an item for todo list by id",
+        "operationId": "modifyTodoItem_1",
+        "parameters": [
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyTodoItem"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoItem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "todo"
+        ],
+        "summary": "Delete item for todo list by id",
+        "operationId": "deleteTodoItem",
+        "parameters": [
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get the authenticated user",
+        "operationId": "getUserInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get all users filtered by q and limited by size and page if the user is authenticated",
+        "operationId": "searchForUser",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/group/{gid}/users": {
+      "get": {
+        "tags": [
+          "group",
+          "user"
+        ],
+        "summary": "Get all users that are a member of the group if the authenticated user has access",
+        "operationId": "getGroupUsers",
+        "parameters": [
+          {
+            "name": "gid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-key": [
+
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "ModifyCalendar": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Calendar": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CalendarEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "calendar": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NewCalendar": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ModifyCalendarEntry": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NewCalendarEntry": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "NewGroup": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "ModifyMember": {
+        "type": "object",
+        "properties": {
+          "admin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NewMember": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "admin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ModifyGroup": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "READ",
+                "CREATE",
+                "MODIFY",
+                "DELETE"
+              ]
+            }
+          }
+        }
+      },
+      "ServerSentEventString": {
+        "type": "object"
+      },
+      "TodoList": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "NewTodoList": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "NewTodoItem": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "TodoItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "list": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "UNSTARTED",
+              "IN_PROGRESS",
+              "DONE",
+              "FAILED"
+            ]
+          }
+        }
+      },
+      "ModifyTodoList": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "ModifyTodoItemStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "UNSTARTED",
+              "IN_PROGRESS",
+              "DONE",
+              "FAILED"
+            ]
+          }
+        }
+      },
+      "ModifyTodoItem": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer-key": {
+        "type": "http",
+        "name": "bearer-key",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "jwt"
+      }
+    }
+  }
+}
