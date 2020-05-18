@@ -65,25 +65,25 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         ServerHttpRequest request = swe.getRequest();
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
+        log.info("{} {}?{}",
+                request.getMethodValue(),
+                request.getPath().value(),
+                request.getQueryParams()
+                        .entrySet()
+                        .stream()
+                        .flatMap(entry -> entry
+                                .getValue()
+                                .stream()
+                                .map(val -> entry.getKey() + "=" + val))
+                        .collect(Collectors.joining("&")));
+        log.info("{}", request.getHeaders());
         if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
-//            log.info(request.getLocalAddress().getHostName());
-            log.info("{} {}?{}",
-                    request.getMethodValue(),
-                    request.getPath().value(),
-                    request.getQueryParams()
-                            .entrySet()
-                            .stream()
-                            .flatMap(entry -> entry
-                                    .getValue()
-                                    .stream()
-                                    .map(val -> entry.getKey() + "=" + val))
-                            .collect(Collectors.joining("&")));
             String authToken = authHeader.substring(TOKEN_PREFIX.length());
             Authentication auth = new JWTAuthenticationToken(authToken);
             return this.jwtAuthManager.authenticate(auth).map(SecurityContextImpl::new);
         }
         String path = swe.getRequest().getPath().pathWithinApplication().value();
-        if (properties.getIgnoredPaths().stream().anyMatch(pattern -> antMatcher.match(pattern, path)) || ("/api/v1/push".equals(path) && swe.getRequest().getMethod() == HttpMethod.GET)) {
+        if (swe.getRequest().getMethod() == HttpMethod.OPTIONS || properties.getIgnoredPaths().stream().anyMatch(pattern -> antMatcher.match(pattern, path)) || ("/api/v1/push".equals(path) && swe.getRequest().getMethod() == HttpMethod.GET)) {
             return Mono.empty();
         }
         swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

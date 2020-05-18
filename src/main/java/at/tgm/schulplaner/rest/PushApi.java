@@ -32,7 +32,7 @@ import reactor.core.publisher.*;
  */
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class PushApi {

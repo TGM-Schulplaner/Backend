@@ -39,7 +39,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class CalendarApi {

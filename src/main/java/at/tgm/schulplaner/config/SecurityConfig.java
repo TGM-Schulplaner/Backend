@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -63,16 +62,16 @@ public class SecurityConfig {
                                 swe.getResponse()
                                         .setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
-                /*.cors()
-                .configurationSource(corsConfigurationSource)
-                .and()*/
+                .cors().disable()/*.configurationSource(corsConfigurationSource)*/
+//                .and()
                 .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
+                .logout().disable()
                 .securityContextRepository(securityContextRepository)
 //                .anonymous().authorities().and()
                 .authorizeExchange()
-                .pathMatchers(HttpMethod.OPTIONS).permitAll()
+//                .pathMatchers(HttpMethod.OPTIONS).permitAll()
                 .pathMatchers("/api/v1/login").permitAll()
                 .pathMatchers("/webjars/**").permitAll()
 //                .pathMatchers(properties.getSecureEndpoints().toArray(String[]::new)).authenticated()
@@ -87,6 +86,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Collections.singletonList("*"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

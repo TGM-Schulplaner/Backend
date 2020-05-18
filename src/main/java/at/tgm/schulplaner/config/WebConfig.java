@@ -16,19 +16,23 @@
 
 package at.tgm.schulplaner.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.reactive.BindingContext;
-import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -63,11 +67,31 @@ public class WebConfig implements WebFluxConfigurer {
         });
     }
 
-    @Override
+    @Bean
+    CorsWebFilter corsWebFilter() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowedOrigins(Collections.singletonList("*"));
+        corsConfig.addAllowedMethod("*");
+        corsConfig.addAllowedHeader("*");
+        corsConfig.setAllowCredentials(true);
+        corsConfig.setMaxAge(3600L);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+        return new CorsWebFilter(source) /*{
+            @Override
+            public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+                Mono<Void> filter = super.filter(exchange, chain);
+                return filter.switchIfEmpty(Mono.fromRunnable(() -> exchange.getResponse().setStatusCode(HttpStatus.OK)));
+            }
+        }*/;
+    }
+
+    /*@Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedHeaders("*")
                 .allowedMethods("*")
-                .allowedOrigins("*");
-    }
+                .allowedOrigins("*")
+                .allowCredentials(true);
+    }*/
 }
